@@ -6,61 +6,56 @@ class FAQPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.purple, title: const Text("FAQ")),
+      appBar: AppBar(backgroundColor: Colors.teal, title: const Text("FAQ")),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           _buildFAQItem(
-            "How does Cognitive App secure my apps?",
-            "Cognitive App provides multiple layers of security, including:\n"
-                "- App Lock – Lock apps using PIN, pattern, fingerprint, or face recognition.\n"
-                "- Intruder Alert – Captures photos of failed login attempts.\n"
-                "- Data Encryption – Encrypts sensitive files for extra protection.\n"
-                "- Stealth Mode – Hides the app icon to prevent detection.\n"
-                "- Anti-Uninstall Protection – Stops unauthorized removal of the app.",
+            "What is CerebroCare?",
+            "CerebroCare is an AI-powered cognitive rehabilitation platform designed to support individuals facing memory loss, attention difficulties, and emotional fatigue. It uses gamified training, journaling, and AI tools to assist users in their mental wellness journey.",
           ),
           _buildFAQItem(
-            "How do I lock an app with Cognitive App?",
-            "1. Open Cognitive App.\n"
-                "2. Select the apps you want to protect.\n"
-                "3. Choose your preferred lock method (PIN, pattern, fingerprint, etc.).\n"
-                "4. Enable protection, and your apps are now secure.",
+            "Who can use CerebroCare?",
+            "CerebroCare is designed for:\n"
+                "- Individuals recovering from cognitive impairments (e.g., due to trauma or age).\n"
+                "- Users dealing with anxiety, PTSD, ADHD, or depression.\n"
+                "- Anyone looking to boost memory, focus, and emotional resilience.",
           ),
           _buildFAQItem(
-            "What happens if I forget my password?",
-            "You can reset your password using:\n"
-                "- Security Questions (if previously set up).\n"
-                "- Email Verification (a reset link will be sent to your registered email).\n"
-                "- Backup Code (if you generated one earlier).",
+            "How does CerebroCare improve memory and focus?",
+            "CerebroCare provides:\n"
+                "- Personalized brain training games.\n"
+                "- Attention enhancement exercises.\n"
+                "- AI-based journaling and mental state analysis.\n"
+                "- Media-based memory recall (images, voice, video prompts).",
           ),
           _buildFAQItem(
-            "Will Cognitive App slow down my phone?",
-            "No, Cognitive App is optimized to run in the background with minimal battery and performance impact. It ensures security without slowing down your device.",
+            "What is Emotional Reconstruction?",
+            "This feature helps users revisit and rebuild positive emotional memories using AI-generated prompts, past journals, and visual/audio cues to foster emotional stability and healing.",
           ),
           _buildFAQItem(
-            "Can I hide Cognitive App from my home screen?",
-            "Yes! You can enable Stealth Mode, which hides the app icon and allows access only through a secret dial code or a disguised calculator interface.",
+            "Is my data secure on CerebroCare?",
+            "Yes. Your personal data, cognitive stats, and journal entries are stored securely using Firebase. Device-level protection and authentication are enforced, and sensitive data is never shared without consent.",
           ),
           _buildFAQItem(
-            "Is Cognitive App free?",
-            "Cognitive App offers both free and premium versions:\n"
-                "- Free Version – Basic app locking and security features.\n"
-                "- Premium Version – Advanced security, cloud backup, fake cover screens, and more.",
+            "Does CerebroCare work offline?",
+            "Some basic training modules may work offline, but features like journaling analysis, emotional reconstruction, and progress tracking require an internet connection.",
           ),
           _buildFAQItem(
-            "How do I prevent unauthorized uninstallation?",
-            "To enable Uninstall Protection:\n"
-                "1. Open Cognitive App > Settings.\n"
-                "2. Enable Uninstall Protection.\n"
-                "3. If someone tries to uninstall the app, they will be required to enter your password.",
+            "What platforms is CerebroCare available on?",
+            "CerebroCare is available on Android (via Play Store) and iOS (via App Store). A web version for therapists and caregivers is in development.",
           ),
           _buildFAQItem(
-            "Does Cognitive App work on all Android and iOS devices?",
-            "Yes, Cognitive App is compatible with most Android and iOS devices. Some features may vary depending on the operating system.",
+            "Is CerebroCare free?",
+            "Yes! CerebroCare offers a free version with access to core features. A premium version unlocks advanced personalization, additional games, and therapist integration.",
           ),
           _buildFAQItem(
-            "Contact Us",
-            "For support or inquiries, reach out to us at cognitiveapp2@gmail.com.",
+            "How can I track my cognitive progress?",
+            "Your dashboard shows real-time cognitive stats (Memory, Mood, Focus) updated based on your activities, journaling, and assessments.",
+          ),
+          _buildFAQItem(
+            "How do I contact CerebroCare support?",
+            "You can reach out to our team at cerebrocare.help@gmail.com for any support, suggestions, or feedback.",
           ),
         ],
       ),

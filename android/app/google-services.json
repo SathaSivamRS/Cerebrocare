@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "1027602646618",
+    "firebase_url": "https://login-demo-d3cb5-default-rtdb.firebaseio.com",
     "project_id": "login-demo-d3cb5",
     "storage_bucket": "login-demo-d3cb5.firebasestorage.app"
   },
@@ -28,7 +29,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBvgI7SHnlUE2qttOdUUxICzn_Ys0Io0ow"
+          "current_key": "AIzaSyCpkFc6ajkVqSrkeFFbxR1mIBKHO2hXsKk"
         }
       ],
       "services": {
