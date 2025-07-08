@@ -3,9 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:login/pages/subscription_page.dart';
 import 'package:login/pages/profile_page.dart';
 import 'package:login/pages/faq_page.dart';
+import 'package:login/pages/brain_training_page.dart';
+import 'package:login/pages/therapist_locator.dart';
+import 'package:login/pages/emotional_reconstruction_page.dart';
+import 'package:login/pages/progress_mapping_page.dart';
 import 'package:login/screens/login_screen.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,11 +20,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  String? _userName;
 
   final List<Widget> _pages = [
     const HomePageContent(),
-    const SubscriptionPage(),
     const ProfilePage(),
     const FAQPage(),
   ];
@@ -29,32 +30,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _fetchUserName();
     _startForceLogoutListener();
-  }
-
-  Future<void> _fetchUserName() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
-    try {
-      final doc =
-          await FirebaseFirestore.instance
-              .collection('cerebrocare_users')
-              .doc(user.uid)
-              .get();
-
-      if (doc.exists) {
-        final data = doc.data();
-        if (data != null && mounted) {
-          setState(() {
-            _userName = data['fullName'] ?? 'User';
-          });
-        }
-      }
-    } catch (e) {
-      print("Failed to fetch user name: $e");
-    }
   }
 
   void _onItemTapped(int index) {
@@ -65,7 +41,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _logout() async {
     await FirebaseAuth.instance.signOut();
-    final storage = FlutterSecureStorage();
+    const storage = FlutterSecureStorage();
     await storage.deleteAll();
     if (mounted) {
       Navigator.pushReplacement(
@@ -101,7 +77,7 @@ class _HomePageState extends State<HomePage> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final storage = FlutterSecureStorage();
+    const storage = FlutterSecureStorage();
     final deviceId = await storage.read(key: 'deviceId');
     if (deviceId == null) return;
 
@@ -133,31 +109,25 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (didPop) async {
-        if (!didPop) {
-          bool shouldExit = await _showLogoutConfirmation(context);
-          if (shouldExit) {
-            _logout();
-          }
+    return WillPopScope(
+      onWillPop: () async {
+        bool shouldExit = await _showLogoutConfirmation(context);
+        if (shouldExit) {
+          _logout();
         }
+        return false;
       },
       child: Scaffold(
         body: _pages[_selectedIndex],
         bottomNavigationBar: BottomNavigationBar(
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.subscriptions),
-              label: "Subscription",
-            ),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
             BottomNavigationBarItem(icon: Icon(Icons.help), label: "FAQ"),
           ],
           currentIndex: _selectedIndex,
           selectedItemColor: Colors.teal,
-          unselectedItemColor: Colors.purple,
+          unselectedItemColor: Colors.grey,
           onTap: _onItemTapped,
         ),
       ),
@@ -165,14 +135,9 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class HomePageContent extends StatefulWidget {
+class HomePageContent extends StatelessWidget {
   const HomePageContent({super.key});
 
-  @override
-  State<HomePageContent> createState() => _HomePageContentState();
-}
-
-class _HomePageContentState extends State<HomePageContent> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -180,7 +145,7 @@ class _HomePageContentState extends State<HomePageContent> {
         color: const Color(0xFFFDF5FF),
         child: Column(
           children: [
-            // Header with gradient background
+            // Header
             Container(
               width: double.infinity,
               padding: const EdgeInsets.only(
@@ -194,10 +159,6 @@ class _HomePageContentState extends State<HomePageContent> {
                   colors: [Color(0xFF00BCD4), Color(0xFF00796B)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(0),
-                  bottomRight: Radius.circular(0),
                 ),
               ),
               child: Row(
@@ -236,7 +197,7 @@ class _HomePageContentState extends State<HomePageContent> {
             const SizedBox(height: 20),
             _buildCognitiveStatusCard(),
             const SizedBox(height: 30),
-            _buildGridIcons(),
+            _buildGridIcons(context),
             const SizedBox(height: 30),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -318,12 +279,24 @@ class _HomePageContentState extends State<HomePageContent> {
     );
   }
 
-  Widget _buildGridIcons() {
+  Widget _buildGridIcons(BuildContext context) {
     final items = [
-      ["Personalized Brain Training", Icons.psychology_alt],
-      ["Therapist Locator", Icons.medical_services],
-      ["Emotional Reconstruction", Icons.self_improvement],
-      ["Progress Mapping", Icons.show_chart],
+      [
+        "Personalized Brain Training",
+        Icons.psychology_alt,
+        const BrainTrainingPage(),
+      ],
+      [
+        "Therapist Locator",
+        Icons.medical_services,
+        const TherapistLocatorPage(),
+      ],
+      [
+        "Emotional Reconstruction",
+        Icons.self_improvement,
+        const EmotionalReconstructionPage(),
+      ],
+      ["Progress Mapping", Icons.show_chart, const ProgressMappingPage()],
     ];
 
     return Padding(
@@ -336,24 +309,32 @@ class _HomePageContentState extends State<HomePageContent> {
         mainAxisSpacing: 24,
         children:
             items.map((e) {
-              return Column(
-                children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Colors.black,
-                    child: Icon(
-                      e[1] as IconData,
-                      color: Colors.white,
-                      size: 30,
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => e[2] as Widget),
+                  );
+                },
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Colors.black,
+                      child: Icon(
+                        e[1] as IconData,
+                        color: Colors.white,
+                        size: 30,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    e[0] as String,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 13),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Text(
+                      e[0] as String,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ],
+                ),
               );
             }).toList(),
       ),
