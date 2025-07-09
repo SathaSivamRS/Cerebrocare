@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class TherapistLocatorPage extends StatefulWidget {
   const TherapistLocatorPage({super.key});
@@ -16,9 +17,12 @@ class TherapistLocatorPage extends StatefulWidget {
 class _TherapistLocatorPageState extends State<TherapistLocatorPage> {
   final MapController _mapController = MapController();
   LatLng? _currentLocation;
-  List<Map<String, dynamic>> _nearbyPlaces = [];
-  final TextEditingController _searchController = TextEditingController();
   double _zoom = 13;
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> _nearbyPlaces = [];
+  double? _distanceInKm;
+  String? _travelDuration;
+  List<LatLng> _routePoints = [];
 
   @override
   void initState() {
@@ -66,8 +70,8 @@ class _TherapistLocatorPageState extends State<TherapistLocatorPage> {
     if (_currentLocation == null) return;
     final lat = _currentLocation!.latitude;
     final lon = _currentLocation!.longitude;
-    const radius = 2000;
 
+    const radius = 2000;
     final query = '''
 [out:json];
 (
@@ -104,18 +108,56 @@ out center;
     }
   }
 
-  void _zoomIn() {
-    setState(() {
-      _zoom += 1;
-      _mapController.move(_currentLocation!, _zoom);
-    });
+  Future<void> _getRouteAndDistance(LatLng destination) async {
+    if (_currentLocation == null) return;
+
+    final start =
+        "${_currentLocation!.longitude},${_currentLocation!.latitude}";
+    final end = "${destination.longitude},${destination.latitude}";
+    final url = Uri.parse(
+      "http://router.project-osrm.org/route/v1/driving/$start;$end?overview=full&geometries=geojson",
+    );
+
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final route = data['routes'][0];
+      final coords = route['geometry']['coordinates'] as List;
+
+      setState(() {
+        _routePoints = coords.map((p) => LatLng(p[1], p[0])).toList();
+        _distanceInKm = route['distance'] / 1000;
+        _travelDuration = _formatDuration(route['duration']);
+      });
+
+      _mapController.move(destination, 15);
+    } else {
+      debugPrint('OSRM API error: ${response.statusCode}');
+    }
   }
 
-  void _zoomOut() {
-    setState(() {
-      _zoom -= 1;
-      _mapController.move(_currentLocation!, _zoom);
-    });
+  String _formatDuration(double seconds) {
+    final minutes = (seconds / 60).round();
+    if (minutes < 60) return "$minutes min";
+    final hours = minutes ~/ 60;
+    final rem = minutes % 60;
+    return "$hours hr $rem min";
+  }
+
+  void _openInGoogleMaps(LatLng location) async {
+    final uri = Uri.parse(
+      "https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}",
+    );
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      debugPrint('Could not launch Google Maps');
+    }
+  }
+
+  void _selectPlace(Map<String, dynamic> place) {
+    final dest = LatLng(place['lat'], place['lng']);
+    _getRouteAndDistance(dest);
   }
 
   @override
@@ -157,8 +199,6 @@ out center;
                       ),
                     ),
                   ),
-
-                  // Map
                   Stack(
                     children: [
                       Container(
@@ -177,8 +217,17 @@ out center;
                                 urlTemplate:
                                     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                                 subdomains: const ['a', 'b', 'c'],
-                                userAgentPackageName: 'com.example.app',
                               ),
+                              if (_routePoints.isNotEmpty)
+                                PolylineLayer(
+                                  polylines: [
+                                    Polyline(
+                                      points: _routePoints,
+                                      strokeWidth: 4,
+                                      color: Colors.blue,
+                                    ),
+                                  ],
+                                ),
                               MarkerLayer(
                                 markers: [
                                   Marker(
@@ -193,24 +242,22 @@ out center;
                                   ),
                                   ..._nearbyPlaces.map((place) {
                                     return Marker(
+                                      point: LatLng(place['lat'], place['lng']),
                                       width: 40,
                                       height: 40,
-                                      point: LatLng(place['lat'], place['lng']),
                                       child: const Icon(
                                         Icons.location_on,
                                         color: Colors.red,
                                         size: 36,
                                       ),
                                     );
-                                  }).toList(),
+                                  }),
                                 ],
                               ),
                             ],
                           ),
                         ),
                       ),
-
-                      // Zoom Buttons
                       Positioned(
                         top: 12,
                         right: 30,
@@ -219,14 +266,20 @@ out center;
                             FloatingActionButton(
                               mini: true,
                               heroTag: 'zoomIn',
-                              onPressed: _zoomIn,
+                              onPressed: () {
+                                setState(() => _zoom += 1);
+                                _mapController.move(_currentLocation!, _zoom);
+                              },
                               child: const Icon(Icons.zoom_in),
                             ),
                             const SizedBox(height: 10),
                             FloatingActionButton(
                               mini: true,
                               heroTag: 'zoomOut',
-                              onPressed: _zoomOut,
+                              onPressed: () {
+                                setState(() => _zoom -= 1);
+                                _mapController.move(_currentLocation!, _zoom);
+                              },
                               child: const Icon(Icons.zoom_out),
                             ),
                           ],
@@ -234,26 +287,35 @@ out center;
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 12),
-
-                  // Nearby list (vertical)
+                  if (_distanceInKm != null && _travelDuration != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        "Distance: ${_distanceInKm!.toStringAsFixed(2)} km | ETA: $_travelDuration",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 8),
                   Expanded(
                     child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       itemCount: _nearbyPlaces.length,
                       itemBuilder: (context, index) {
                         final place = _nearbyPlaces[index];
+                        final LatLng placeLoc = LatLng(
+                          place['lat'],
+                          place['lng'],
+                        );
                         return GestureDetector(
-                          onTap: () {
-                            _mapController.move(
-                              LatLng(place['lat'], place['lng']),
-                              16,
-                            );
-                          },
+                          onTap: () => _selectPlace(place),
+                          onLongPress: () => _openInGoogleMaps(placeLoc),
                           child: Card(
-                            margin: const EdgeInsets.symmetric(vertical: 6),
-                            child: Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            child: Padding(
                               padding: const EdgeInsets.all(12),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
