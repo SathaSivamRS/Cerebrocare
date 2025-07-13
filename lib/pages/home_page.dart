@@ -4,12 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:login/pages/faq_page.dart';
-import 'package:login/pages/games_page.dart';
-import 'package:login/pages/settings_page.dart';
 import 'package:login/pages/brain_training_page.dart';
 import 'package:login/pages/therapist_locator.dart';
 import 'package:login/pages/emotional_reconstruction_page.dart';
 import 'package:login/pages/progress_mapping_page.dart';
+import 'package:login/pages/games_page.dart'; // ✅ GamesPage
+import 'package:login/pages/settings_page.dart'; // ✅ SettingsPage
 import 'package:login/screens/login_screen.dart';
 
 class HomePage extends StatefulWidget {
@@ -122,10 +122,6 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         body: _pages[_selectedIndex],
         bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          selectedItemColor: Colors.teal,
-          unselectedItemColor: Colors.grey,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
             BottomNavigationBarItem(
@@ -138,6 +134,10 @@ class _HomePageState extends State<HomePage> {
             ),
             BottomNavigationBarItem(icon: Icon(Icons.help), label: "FAQ"),
           ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.teal,
+          unselectedItemColor: Colors.grey,
+          onTap: _onItemTapped,
         ),
       ),
     );

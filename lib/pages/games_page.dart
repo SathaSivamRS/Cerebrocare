@@ -1,253 +1,181 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'package:google_fonts/google_fonts.dart';
 
-void main() => runApp(const MemorySortGame());
-
-class MemorySortGame extends StatelessWidget {
-  const MemorySortGame({super.key});
+class GamesPage extends StatelessWidget {
+  const GamesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Memory Sort',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: Colors.black),
-      home: const MemorySortScreen(),
-    );
-  }
-}
-
-class MemorySortScreen extends StatefulWidget {
-  const MemorySortScreen({super.key});
-
-  @override
-  State<MemorySortScreen> createState() => _MemorySortScreenState();
-}
-
-class _MemorySortScreenState extends State<MemorySortScreen> {
-  int currentLevel = 0;
-  final int maxLevel = 5;
-  late List<String> originalList;
-  late List<String> shuffledList;
-  bool showMemory = true;
-
-  final List<List<String>> levelItems = [
-    ['🍎 Apple', '🍌 Banana', '🍇 Grapes', '🍓 Strawberry'],
-    ['🐶 Dog', '🐱 Cat', '🐭 Mouse', '🦊 Fox', '🐰 Rabbit', '🐻 Bear'],
-    [
-      '🚗 Car',
-      '🚕 Taxi',
-      '🚌 Bus',
-      '🚓 Police',
-      '🏎 Racecar',
-      '🚑 Ambulance',
-      '🚒 Firetruck',
-      '🚜 Tractor',
-    ],
-    [
-      '🏠 House',
-      '🏢 Office',
-      '🏥 Hospital',
-      '🏫 School',
-      '🏬 Mall',
-      '🏛 Museum',
-      '⛪ Church',
-      '🏰 Castle',
-      '🗼 Tower',
-      '🕌 Mosque',
-    ],
-    [
-      '😀 Smile',
-      '😢 Cry',
-      '😡 Angry',
-      '😱 Shocked',
-      '🥶 Cold',
-      '🥵 Hot',
-      '😴 Sleepy',
-      '🤓 Nerd',
-      '🤠 Cowboy',
-      '🥳 Party',
-      '😇 Angel',
-      '👽 Alien',
-    ],
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    loadLevel();
-  }
-
-  void loadLevel() {
-    originalList = levelItems[currentLevel];
-    shuffledList = List.from(originalList)..shuffle();
-    showMemory = true;
-
-    Future.delayed(const Duration(seconds: 4), () {
-      if (mounted) {
-        setState(() {
-          showMemory = false;
-        });
-      }
-    });
-  }
-
-  void checkAnswer() {
-    if (shuffledList.join() == originalList.join()) {
-      if (currentLevel == maxLevel - 1) {
-        _showDialog(
-          "🎉 Game Complete!",
-          "You’ve conquered all levels of Memory Sort!",
-          backToHome: true,
-        );
-      } else {
-        _showDialog(
-          "✅ Correct!",
-          "Get ready for the next level.",
-          nextLevel: true,
-        );
-      }
-    } else {
-      _showDialog(
-        "❌ Wrong Order",
-        "Try again to match the sequence correctly.",
-        retry: true,
-      );
-    }
-  }
-
-  void _showDialog(
-    String title,
-    String message, {
-    bool nextLevel = false,
-    bool retry = false,
-    bool backToHome = false,
-  }) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder:
-          (_) => AlertDialog(
-            backgroundColor: Colors.black87,
-            title: Text(title, style: const TextStyle(color: Colors.white)),
-            content: Text(
-              message,
-              style: const TextStyle(color: Colors.white70),
-            ),
-            actions: [
-              if (nextLevel)
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    setState(() {
-                      currentLevel++;
-                      loadLevel();
-                    });
-                  },
-                  child: const Text('Next Level'),
-                ),
-              if (retry)
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    loadLevel();
-                  },
-                  child: const Text('Retry'),
-                ),
-              if (backToHome)
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Back to Home'),
-                ),
-            ],
-          ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Memory Sort • Level ${currentLevel + 1}/$maxLevel'),
-        backgroundColor: Colors.black87,
-      ),
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-          Text(
-            showMemory
-                ? '🧠 Remember this order:'
-                : '🔁 Reorder the items correctly:',
-            style: const TextStyle(fontSize: 18),
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 400),
-              child:
-                  showMemory
-                      ? _buildMemoryList(originalList)
-                      : _buildReorderableList(),
-            ),
-          ),
-          if (!showMemory)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: ElevatedButton.icon(
-                onPressed: checkAnswer,
-                icon: const Icon(Icons.check),
-                label: const Text('Submit'),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMemoryList(List<String> list) {
-    return ListView.separated(
-      key: const ValueKey("memory"),
-      padding: const EdgeInsets.all(16),
-      itemCount: list.length,
-      itemBuilder:
-          (context, index) => Card(
-            color: Colors.blueGrey,
-            child: ListTile(
-              title: Text(list[index], style: const TextStyle(fontSize: 20)),
-            ),
-          ),
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
-    );
-  }
-
-  Widget _buildReorderableList() {
-    return ReorderableListView(
-      key: const ValueKey("reorder"),
-      padding: const EdgeInsets.all(16),
-      children: [
-        for (int i = 0; i < shuffledList.length; i++)
-          Card(
-            key: ValueKey(shuffledList[i]),
-            color: Colors.tealAccent.shade200.withOpacity(0.6),
-            child: ListTile(
-              leading: const Icon(Icons.drag_indicator),
-              title: Text(
-                shuffledList[i],
-                style: const TextStyle(fontSize: 20),
-              ),
-            ),
-          ),
-      ],
-      onReorder: (oldIndex, newIndex) {
-        setState(() {
-          if (newIndex > oldIndex) newIndex--;
-          final item = shuffledList.removeAt(oldIndex);
-          shuffledList.insert(newIndex, item);
-        });
+    final List<Map<String, dynamic>> games = [
+      {
+        'title': 'Memory Match',
+        'image': 'assets/Memory match.png',
+        'comingSoon': false,
       },
+      {
+        'title': 'Recall Rally',
+        'image': 'assets/Recall Rally.png',
+        'comingSoon': false,
+      },
+      {
+        'title': 'SituActions',
+        'image': 'assets/Situactions.png',
+        'comingSoon': false,
+      },
+      {'title': 'Coming Soon', 'image': null, 'comingSoon': true},
+    ];
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFFDF5FF),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 🔷 Header
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF00BCD4), Color(0xFF00796B)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.videogame_asset_outlined,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Brain Games',
+                    style: GoogleFonts.lobsterTwo(
+                      textStyle: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                "Sharpen your mind with quick games 🧠",
+                style: GoogleFonts.lobsterTwo(
+                  textStyle: const TextStyle(
+                    fontSize: 18,
+                    color: Color(0xFF333333),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: GridView.builder(
+                  itemCount: games.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 20,
+                    mainAxisSpacing: 20,
+                    childAspectRatio: 0.9,
+                  ),
+                  itemBuilder: (context, index) {
+                    final game = games[index];
+
+                    return GestureDetector(
+                      onTap: () {
+                        if (!game['comingSoon']) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("${game['title']} tapped!")),
+                          );
+                        }
+                      },
+                      child: Opacity(
+                        opacity: game['comingSoon'] ? 0.6 : 1.0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 6,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (game['image'] != null)
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Image.asset(
+                                    game['image'],
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              else
+                                const Icon(
+                                  Icons.lock_outline,
+                                  size: 50,
+                                  color: Colors.grey,
+                                ),
+
+                              const SizedBox(height: 14),
+
+                              Text(
+                                game['title'],
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.lobsterTwo(
+                                  textStyle: TextStyle(
+                                    fontSize: 18,
+                                    color:
+                                        game['comingSoon']
+                                            ? Colors.grey[600]
+                                            : Colors.black,
+                                  ),
+                                ),
+                              ),
+
+                              if (game['comingSoon'])
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 4),
+                                  child: Text(
+                                    "Coming Soon",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
