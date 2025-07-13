@@ -3,8 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:login/pages/profile_page.dart';
 import 'package:login/pages/faq_page.dart';
+import 'package:login/pages/games_page.dart';
+import 'package:login/pages/settings_page.dart';
 import 'package:login/pages/brain_training_page.dart';
 import 'package:login/pages/therapist_locator.dart';
 import 'package:login/pages/emotional_reconstruction_page.dart';
@@ -23,7 +24,8 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = [
     const HomePageContent(),
-    const ProfilePage(),
+    const GamesPage(),
+    const SettingsPage(),
     const FAQPage(),
   ];
 
@@ -120,15 +122,22 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         body: _pages[_selectedIndex],
         bottomNavigationBar: BottomNavigationBar(
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-            BottomNavigationBarItem(icon: Icon(Icons.help), label: "FAQ"),
-          ],
           currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
           selectedItemColor: Colors.teal,
           unselectedItemColor: Colors.grey,
-          onTap: _onItemTapped,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.sports_esports),
+              label: "Games",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: "Settings",
+            ),
+            BottomNavigationBarItem(icon: Icon(Icons.help), label: "FAQ"),
+          ],
         ),
       ),
     );
@@ -145,7 +154,6 @@ class HomePageContent extends StatelessWidget {
         color: const Color(0xFFFDF5FF),
         child: Column(
           children: [
-            // Header
             Container(
               width: double.infinity,
               padding: const EdgeInsets.only(
@@ -281,11 +289,7 @@ class HomePageContent extends StatelessWidget {
 
   Widget _buildGridIcons(BuildContext context) {
     final items = [
-      [
-        "Personalized Brain Training",
-        Icons.psychology_alt,
-        const BrainTrainingPage(),
-      ],
+      ["Brain Training", Icons.psychology_alt, const BrainTrainingPage()],
       [
         "Therapist Locator",
         Icons.medical_services,

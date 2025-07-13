@@ -94,6 +94,9 @@ flutter:
     - assets/profile.png
     - assets/edit_profile.png
     - assets/logo.png
+    - assets/Memory match.png
+    - assets/Recall Rally.png
+    - assets/Situactions.png
     # - images/a_dot_ham.jpeg
 flutter_icons:
   android: true
