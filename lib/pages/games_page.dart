@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+// import '../games/memory_sort_game.dart'; // ✅ MemorySortScreen
+import '../games/recall_rally_game.dart'; // ✅ RecallRallyScreen
 
 class GamesPage extends StatelessWidget {
   const GamesPage({super.key});
@@ -10,19 +12,27 @@ class GamesPage extends StatelessWidget {
       {
         'title': 'Memory Match',
         'image': 'assets/Memory match.png',
-        'comingSoon': false,
+        'comingSoon': true,
+        'screen': null,
       },
       {
         'title': 'Recall Rally',
         'image': 'assets/Recall Rally.png',
         'comingSoon': false,
+        'screen': const RecallRallyScreen(),
       },
       {
         'title': 'SituActions',
         'image': 'assets/Situactions.png',
-        'comingSoon': false,
+        'comingSoon': true,
+        'screen': null,
       },
-      {'title': 'Coming Soon', 'image': null, 'comingSoon': true},
+      {
+        'title': 'Coming Soon',
+        'image': null,
+        'comingSoon': true,
+        'screen': null,
+      },
     ];
 
     return Scaffold(
@@ -61,9 +71,9 @@ class GamesPage extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(height: 24),
 
+            // 🔹 Intro Text
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -77,9 +87,9 @@ class GamesPage extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 20),
 
+            // 🔸 Grid of Games
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -96,11 +106,19 @@ class GamesPage extends StatelessWidget {
 
                     return GestureDetector(
                       onTap: () {
-                        if (!game['comingSoon']) {
+                        if (game['comingSoon']) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("${game['title']} tapped!")),
+                            SnackBar(
+                              content: Text("${game['title']} is coming soon."),
+                            ),
                           );
+                          return;
                         }
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => game['screen']),
+                        );
                       },
                       child: Opacity(
                         opacity: game['comingSoon'] ? 0.6 : 1.0,
@@ -135,9 +153,7 @@ class GamesPage extends StatelessWidget {
                                   size: 50,
                                   color: Colors.grey,
                                 ),
-
                               const SizedBox(height: 14),
-
                               Text(
                                 game['title'],
                                 textAlign: TextAlign.center,
@@ -151,7 +167,6 @@ class GamesPage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-
                               if (game['comingSoon'])
                                 const Padding(
                                   padding: EdgeInsets.only(top: 4),
