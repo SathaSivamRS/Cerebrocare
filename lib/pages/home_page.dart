@@ -3,14 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:login/pages/faq_page.dart';
-import 'package:login/pages/brain_training_page.dart';
-import 'package:login/pages/therapist_locator.dart';
-import 'package:login/pages/emotional_reconstruction_page.dart';
-import 'package:login/pages/progress_mapping_page.dart';
-import 'package:login/pages/games_page.dart'; // ✅ GamesPage
-import 'package:login/pages/settings_page.dart'; // ✅ SettingsPage
-import 'package:login/screens/login_screen.dart';
+ import '../pages/faq_page.dart';
+import '../pages/brain_training_page.dart';
+import '../pages/therapist_locator.dart';
+import '../pages/emotional_reconstruction_page.dart';
+import '../pages/progress_mapping_page.dart';
+import '../pages/games_page.dart';
+import '../pages/settings_page.dart';
+import '../screens/login_screen.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

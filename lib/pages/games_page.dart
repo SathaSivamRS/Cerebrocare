@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import '../games/memory_sort_game.dart'; // ✅ MemorySortScreen
+import '../games/memory_match_game.dart'; // ✅ MemoryMatchGame screen
 import '../games/recall_rally_game.dart'; // ✅ RecallRallyScreen
 
 class GamesPage extends StatelessWidget {
@@ -12,8 +12,8 @@ class GamesPage extends StatelessWidget {
       {
         'title': 'Memory Match',
         'image': 'assets/Memory match.png',
-        'comingSoon': true,
-        'screen': null,
+        'comingSoon': false,
+        'screen': const MemoryMatchGame(),
       },
       {
         'title': 'Recall Rally',

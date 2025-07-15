@@ -3,7 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import '../services/auth_service.dart';
-import 'package:login/pages/home_page.dart';
+import '../pages/home_page.dart'; // ✅ Fixed to relative import
+
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
