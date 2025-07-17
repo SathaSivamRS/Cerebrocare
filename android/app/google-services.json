@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1030815783186",
+    "firebase_url": "https://cerebrocare-ieee-default-rtdb.firebaseio.com",
+    "project_id": "cerebrocare-ieee",
+    "storage_bucket": "cerebrocare-ieee.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1030815783186:android:98ab92300a00f2e3fe3bcb",
+        "android_client_info": {
+          "package_name": "com.example.cerebrocare_ieee"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1030815783186-ovsf6qm8koqimtohahv0imfdlo8rvvvp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cerebrocare_ieee",
+            "certificate_hash": "ba428784358c9d907b2337d2d9a2d775e08f9e8c"
+          }
+        },
+        {
+          "client_id": "1030815783186-phcjt2tut984o8odu3cv79p44nhe7408.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXgBQz8nWBXuJWIBrzQ-uqPgEvs1Utqos"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1030815783186-phcjt2tut984o8odu3cv79p44nhe7408.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1030815783186-5er5h395h63lcmkkh7p3ehcoc3dn97r4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.cerebrocareIeee"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
