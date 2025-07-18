@@ -23,10 +23,10 @@ android {
 
     defaultConfig {
         applicationId = "com.example.cerebrocare_ieee"
-        minSdkVersion(23)  // ✅ Correct Kotlin DSL
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        minSdk = 23
+        targetSdk = 34
+        versionCode = 13
+        versionName = "1.0"
     }
 
     buildTypes {
